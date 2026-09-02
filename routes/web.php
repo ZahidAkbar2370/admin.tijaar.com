@@ -221,6 +221,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('payment-methods/paypal', [\App\Http\Controllers\Admin\PaymentMethodSettingsController::class, 'updatePaypal'])->name('payment-methods.paypal.update');
         Route::get('payment-methods/easypaisa', [\App\Http\Controllers\Admin\PaymentMethodSettingsController::class, 'easypaisa'])->name('payment-methods.easypaisa');
         Route::post('payment-methods/easypaisa', [\App\Http\Controllers\Admin\PaymentMethodSettingsController::class, 'updateEasypaisa'])->name('payment-methods.easypaisa.update');
+        Route::post('payment-methods/{method}/logo', [\App\Http\Controllers\Admin\PaymentMethodSettingsController::class, 'uploadLogo'])->name('payment-methods.logo');
+        Route::delete('payment-methods/{method}/logo', [\App\Http\Controllers\Admin\PaymentMethodSettingsController::class, 'removeLogo'])->name('payment-methods.logo.remove');
 
         // Commission — legacy URLs redirect; advanced rules at commissions.*
         Route::get('commission', [\App\Http\Controllers\Admin\CommissionSettingsController::class, 'index'])->name('commission-settings.index');

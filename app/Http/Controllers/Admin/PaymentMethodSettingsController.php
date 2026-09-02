@@ -120,6 +120,46 @@ class PaymentMethodSettingsController extends Controller
         return response()->json($result, ($result['success'] ?? false) ? 200 : 422);
     }
 
+    public function uploadLogo(Request $request, string $method): JsonResponse
+    {
+        $methodKey = $this->resolveMethod($method);
+        if (! $methodKey) {
+            return response()->json(['success' => false, 'message' => 'Payment method not found.'], 404);
+        }
+
+        $request->validate([
+            'logo' => 'required|file|mimes:jpeg,jpg,png,webp,svg|max:2048',
+        ]);
+
+        BrandLogo::storePaymentLogo($methodKey, $request->file('logo'));
+        $config = $this->methods()[$methodKey];
+
+        return response()->json([
+            'success' => true,
+            'logo_url' => BrandLogo::paymentMethod($methodKey),
+            'has_custom_logo' => true,
+            'message' => ($config['label'] ?? 'Payment method').' logo updated.',
+        ]);
+    }
+
+    public function removeLogo(string $method): JsonResponse
+    {
+        $methodKey = $this->resolveMethod($method);
+        if (! $methodKey) {
+            return response()->json(['success' => false, 'message' => 'Payment method not found.'], 404);
+        }
+
+        BrandLogo::removePaymentLogo($methodKey);
+        $config = $this->methods()[$methodKey];
+
+        return response()->json([
+            'success' => true,
+            'logo_url' => BrandLogo::paymentMethod($methodKey),
+            'has_custom_logo' => false,
+            'message' => ($config['label'] ?? 'Payment method').' logo reset to default.',
+        ]);
+    }
+
     protected function render(string $method): View
     {
         $config = $this->methods()[$method];
@@ -149,8 +189,6 @@ class PaymentMethodSettingsController extends Controller
                 $rules['settings.' . $key] = $field['rules'];
             }
         }
-        $rules['logo'] = 'nullable|file|mimes:jpeg,jpg,png,webp,svg|max:2048';
-        $rules['remove_logo'] = 'nullable|in:0,1';
         $request->validate($rules);
 
         $input = (array) $request->input('settings', []);
@@ -166,12 +204,6 @@ class PaymentMethodSettingsController extends Controller
                 $value = (string) max(1, min(99, (int) $value));
             }
             Setting::set($key, $value);
-        }
-
-        if ($request->boolean('remove_logo')) {
-            BrandLogo::removePaymentLogo($method);
-        } elseif ($request->hasFile('logo')) {
-            BrandLogo::storePaymentLogo($method, $request->file('logo'));
         }
 
         $this->syncConfigToRuntime();
@@ -310,6 +342,11 @@ class PaymentMethodSettingsController extends Controller
         }
 
         return trim((string) Setting::get($meta['logo_setting_key'], '')) !== '';
+    }
+
+    protected function resolveMethod(string $method): ?string
+    {
+        return array_key_exists($method, $this->methods()) ? $method : null;
     }
 
     protected function syncConfigToRuntime(): void

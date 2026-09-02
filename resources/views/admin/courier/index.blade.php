@@ -93,10 +93,6 @@
                                 <div class="min-w-0">
                                     <h2 class="text-base font-semibold text-gray-900 leading-snug">{{ $courier['label'] }}</h2>
                                     <p class="text-sm text-gray-500 mt-0.5 line-clamp-2">{{ $courier['description'] ?? $courier['label'] }}</p>
-                                    <p
-                                        data-logo-kind="{{ $courier['value'] }}"
-                                        class="text-[11px] font-semibold uppercase tracking-wide mt-1 {{ $courier['has_custom_logo'] ? 'text-emerald-600' : 'text-gray-400' }}"
-                                    >{{ $courier['has_custom_logo'] ? 'Custom logo' : 'Default logo' }}</p>
                                 </div>
                                 <span
                                     data-courier-badge="{{ $courier['value'] }}"
@@ -168,15 +164,9 @@ document.addEventListener('alpine:init', () => {
 
         setLogoUi(provider, logoUrl, hasCustom) {
             const img = document.querySelector(`[data-courier-logo="${provider}"]`);
-            const kind = document.querySelector(`[data-logo-kind="${provider}"]`);
             const resetBtn = document.querySelector(`[data-reset-logo="${provider}"]`);
             if (img && logoUrl) {
                 img.src = logoUrl + (logoUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-            }
-            if (kind) {
-                kind.textContent = hasCustom ? 'Custom logo' : 'Default logo';
-                kind.className = 'text-[11px] font-semibold uppercase tracking-wide mt-1 '
-                    + (hasCustom ? 'text-emerald-600' : 'text-gray-400');
             }
             if (resetBtn) {
                 resetBtn.classList.toggle('hidden', !hasCustom);

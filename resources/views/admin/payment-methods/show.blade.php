@@ -19,15 +19,14 @@
     @include('admin.payment-methods.partials.nav')
     @include('admin.partials.settings-flash')
 
-    <form method="POST" action="{{ route('admin.payment-methods.' . $method . '.update') }}" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+    <form method="POST" action="{{ route('admin.payment-methods.' . $method . '.update') }}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
         @csrf
 
         <div class="pb-6 border-b border-gray-100">
             @include('admin.partials.brand-logo-field', [
-                'inputName' => 'logo',
+                'method' => $method,
                 'logoUrl' => $logo_url,
-                'removeName' => $has_custom_logo ? 'remove_logo' : null,
-                'help' => 'Shown at checkout when this payment method is enabled. Upload your own logo or keep the default.',
+                'hasCustomLogo' => $has_custom_logo,
             ])
         </div>
 
