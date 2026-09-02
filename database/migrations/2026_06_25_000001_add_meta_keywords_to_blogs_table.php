@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (Schema::hasTable('blogs') && ! Schema::hasColumn('blogs', 'meta_keywords')) {
+            Schema::table('blogs', function (Blueprint $table) {
+                $table->string('meta_keywords')->nullable()->after('meta_description');
+            });
+        }
+    }
+
+    public function down(): void
+    {
+        if (Schema::hasTable('blogs') && Schema::hasColumn('blogs', 'meta_keywords')) {
+            Schema::table('blogs', function (Blueprint $table) {
+                $table->dropColumn('meta_keywords');
+            });
+        }
+    }
+};
